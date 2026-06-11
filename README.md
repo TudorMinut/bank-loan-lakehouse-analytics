@@ -147,6 +147,7 @@ This adds an AI-assisted layer on top of the analytical pipeline and makes the p
 ---
 
 ## Power BI Dashboard 
+<img width="1115" height="632" alt="image" src="https://github.com/user-attachments/assets/0b02e3f3-b3ef-4701-933b-56dd58fa4496" />
 
 The final tables from the Gold Layer are exposed to Power BI using the native Databricks connector, trough Azure Databricks. This establishes a direct link to the optimized Delta tables, allowing for high-performance reporting.
 
@@ -161,6 +162,8 @@ The dashboard can include:
 * AI-generated customer profile summaries
 
 The goal of the dashboard is to help business users understand customer behavior and identify groups that may be suitable for future credit programs.
+<img width="1111" height="504" alt="image" src="https://github.com/user-attachments/assets/341e5290-17ae-4f9f-9803-aafb672d7d5d" />
+<img width="1065" height="499" alt="image" src="https://github.com/user-attachments/assets/79838fdd-a60e-4a4a-b628-7cd1d39dd500" />
 
 ---
 
