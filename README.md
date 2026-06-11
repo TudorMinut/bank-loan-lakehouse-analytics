@@ -10,32 +10,34 @@ The project takes raw bank client data, processes it through a Bronze-Silver-Gol
 
 The goal of this project is to transform raw customer banking data into useful business insights for future credit and marketing programs.
 
-The pipeline starts from a CSV file containing bank client information such as age, income, education, family size, mortgage value, online banking usage, credit card ownership, and personal loan acceptance. The initial file is provided by Databricks and has the data of 5000 clients.
+The pipeline starts from a CSV file containing bank client information such as age, income, education, family size, mortgage value, online banking usage, credit card ownership, and personal loan acceptance. The initial file is provided by Databricks and contains the data of 5,000 clients.
 
 The data is uploaded to AWS S3, processed in Databricks, stored as Delta tables, and organized into multiple layers:
 
-* **Bronze Layer**: raw ingested data
-* **Silver Layer**: cleaned and validated data
-* **Gold Layer**: business-ready aggregated tables for reporting
-* **Power BI Dashboard**: visual analytics for loan trends, customer segments, and KPIs
+* **Bronze Layer**: Raw ingested data.
+* **Silver Layer**: Cleaned and validated data.
+* **Gold Layer**: Business-ready aggregated tables for reporting.
+* **Power BI Dashboard**: Visual analytics for loan trends, customer segments, and KPIs.
 
 ---
 
 ## Tech Stack
 
-* **Databricks** — used as the main Lakehouse platform for data processing, table management, and job scheduling.
-* **PySpark** — used for scalable transformations across the Bronze, Silver, and Gold layers.
-* **SQL** — used for table creation, validation queries, and AI-powered customer summaries.
-* **AWS S3** — used as cloud storage for the raw CSV file.
-* **Delta Lake** — used for reliable table storage inside Databricks.
-* **Power BI** — used to build dashboards from the final Gold-layer tables.
+* **Databricks**: Used as the main Lakehouse platform for data processing, table management, and job scheduling.
+* **PySpark**: Used for scalable transformations across the Bronze, Silver, and Gold layers.
+* **SQL**: Used for table creation, validation queries, and AI-powered customer summaries.
+* **AWS S3**: Used as cloud storage for the raw CSV file and underlying Delta table storage.
+* **Delta Lake**: Used for reliable, ACID-compliant table storage inside Databricks.
+* **Power BI**: Used to build dashboards from the final Gold-layer tables.
 
-PySpark is useful because it can scale to much larger datasets, although for a small dataset of around 5,000 rows it may introduce more complexity than a simple pandas-based workflow. In this project, it is used to demonstrate a realistic cloud data engineering architecture.
+**Why PySpark?**
+PySpark is highly useful because it can seamlessly scale to handle massive datasets. Although for a small dataset of around 5,000 rows it may introduce more complexity than a simple pandas-based workflow, it is utilized in this project to demonstrate a realistic, future-proof cloud data engineering architecture.
 
 ---
 
-## Pipeline Architecture Diagram
-<img width="1169" height="827" alt="bank_loan_lakehouse_architecture drawio (1)" src="https://github.com/user-attachments/assets/b94de71c-1b8e-457f-b9e3-341aa4209d27" />
+## Pipeline Architecture
+
+<img width="1169" height="827" alt="bank_loan_lakehouse_architecture" src="https://github.com/user-attachments/assets/b94de71c-1b8e-457f-b9e3-341aa4209d27" />
 
 A Databricks scheduled job runs the pipeline every day at **08:00**, refreshing the Bronze, Silver, and Gold layers from the latest cloud data.
 
@@ -44,67 +46,26 @@ A Databricks scheduled job runs the pipeline every day at **08:00**, refreshing 
 ## Pipeline Steps
 
 ### 1. Setup
-
-The setup notebook creates the main Databricks catalog and schemas used by the Lakehouse pipeline:
-
+The setup notebook creates the main Databricks catalog and schemas used by the Lakehouse pipeline to keep the project organized according to Medallion Architecture best practices:
 * `bank_lakehouse.bronze`
 * `bank_lakehouse.silver`
 * `bank_lakehouse.gold`
 
-This keeps the project organized according to the Medallion Architecture.
-
----
-
 ### 2. Ingestion to AWS S3
-
-The raw bank loan dataset is first copied from a Databricks volume into an AWS S3 bucket.
-
-The S3 bucket acts as the cloud landing zone for the raw CSV file, making the data accessible to the Databricks ETL pipeline.
-
----
+The raw bank loan dataset is first copied from a Databricks volume into an AWS S3 bucket. The S3 bucket acts as the cloud landing zone for the raw CSV file, making the data accessible to the Databricks ETL pipeline.
 
 ### 3. Bronze Layer
-
-The Bronze layer reads the raw CSV file from S3.
-
-At this stage, the data is kept close to its original format, but column names are standardized so they are easier to query and process later.
-
-The result is saved as a Delta table:
-
-```text
-bank_lakehouse.bronze.bank_loans
-```
-
----
+The Bronze layer reads the raw CSV file from S3. At this stage, the data is kept close to its original format, but column names are standardized so they are easier to query and process later. The result is saved as a Delta table: `bank_lakehouse.bronze.bank_loans`.
 
 ### 4. Silver Layer
+The Silver layer cleans and prepares the data for analytics. Main transformations include:
+* Removing duplicate records.
+* Casting columns to correct data types.
+* Fixing negative experience values.
+* Creating readable education categories, income groups, and a mortgage ownership flag.
+* Running basic data quality checks.
 
-The Silver layer cleans and prepares the data for analytics.
-
-Main transformations include:
-
-* Removing duplicate records
-* Casting columns to correct data types
-* Fixing negative experience values
-* Creating readable education categories
-* Creating income groups
-* Creating a mortgage ownership flag
-* Running basic data quality checks
-
-The cleaned table is saved as:
-
-```text
-bank_lakehouse.silver.bank_loans_clean
-```
-
-Examples of added fields:
-
-* `education_level`
-* `income_group`
-* `has_mortgage`
-
-
----
+The cleaned table is saved as: `bank_lakehouse.silver.bank_loans_clean`.
 
 ### 5. Gold Layer
 
@@ -128,10 +89,7 @@ These tables help answer business questions such as:
 * Which customer segments are most valuable for future campaigns?
 * What are the main KPIs of the customer base?
 
-
-*Example: taking the data from the Silver Layer and transforming it in a column determing how digital engaged is a client with the products of the bank:*
 ```
-python
 digital_df = (
     silver_df
     .withColumn(
@@ -160,6 +118,7 @@ gold_digital.write.format("delta") \
     .option("overwriteSchema", "true") \
     .saveAsTable("bank_lakehouse.gold.loan_acceptance_by_digital_engagement")
 ```
+*Example: taking the data from the Silver Layer and transforming it in a column determing how digital engaged is a client with the products of the bank:*
 ---
 
 ## AI-Powered Customer Summaries
@@ -187,9 +146,9 @@ This adds an AI-assisted layer on top of the analytical pipeline and makes the p
 
 ---
 
-## Power BI Dashboard
+## Power BI Dashboard 
 
-The final Gold tables are connected to Power BI for visualization.
+The final tables from the Gold Layer are exposed to Power BI using the native Databricks connector, trough Azure Databricks. This establishes a direct link to the optimized Delta tables, allowing for high-performance reporting.
 
 The dashboard can include:
 
@@ -220,7 +179,7 @@ This simulates a real-world production data pipeline where dashboards are update
 Future improvements could include:
 * More AI powered functionalities
 * Saving the ETL layers in AWS instead of Databricks?
-* Ingesting data from Apache Kafka
+* Ingesting data via streaming from Apache Kafka
 * Adding more advanced data quality checks
 * Using Databricks Auto Loader for incremental ingestion
 * Adding historical snapshots instead of overwriting tables
