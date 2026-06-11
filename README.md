@@ -35,8 +35,7 @@ PySpark is useful because it can scale to much larger datasets, although for a s
 ---
 
 ## Pipeline Architecture Diagram
-<img width="686" height="711" alt="bank_loan_lakehouse_architecture drawio" src="https://github.com/user-attachments/assets/762fa102-cb92-4647-a21d-6aa7e864511e" />
-
+<img width="1169" height="827" alt="bank_loan_lakehouse_architecture drawio (1)" src="https://github.com/user-attachments/assets/b94de71c-1b8e-457f-b9e3-341aa4209d27" />
 
 A Databricks scheduled job runs the pipeline every day at **08:00**, refreshing the Bronze, Silver, and Gold layers from the latest cloud data.
 
@@ -129,6 +128,38 @@ These tables help answer business questions such as:
 * Which customer segments are most valuable for future campaigns?
 * What are the main KPIs of the customer base?
 
+
+*Example: taking the data from the Silver Layer and transforming it in a column determing how digital engaged is a client with the products of the bank:*
+```
+python
+digital_df = (
+    silver_df
+    .withColumn(
+        "digital_engagement_segment",
+        when((col("online") == 1) & (col("creditcard") == 1), "Online + Credit Card")
+        .when((col("online") == 1) & (col("creditcard") == 0), "Online Only")
+        .when((col("online") == 0) & (col("creditcard") == 1), "Credit Card Only")
+        .otherwise("Low Digital Engagement")
+    )
+)
+
+gold_digital = (
+    digital_df
+    .groupBy("digital_engagement_segment")
+    .agg(
+        count("*").alias("customer_count"),
+        spark_sum("personal_loan").alias("loan_accept_count"),
+        round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
+        round(avg("income"), 2).alias("avg_income"),
+        round(avg("ccavg"), 2).alias("avg_credit_card_spend")
+    )
+)
+
+gold_digital.write.format("delta") \
+    .mode("overwrite") \
+    .option("overwriteSchema", "true") \
+    .saveAsTable("bank_lakehouse.gold.loan_acceptance_by_digital_engagement")
+```
 ---
 
 ## AI-Powered Customer Summaries
@@ -150,6 +181,9 @@ For each customer, the summary considers attributes such as:
 * Mortgage status
 
 This adds an AI-assisted layer on top of the analytical pipeline and makes the project more practical for CRM, sales, and marketing use cases.
+
+*Example of summary:*
+"The customer is a 47-year-old individual with a stable income of $105,000 per year, holding an undergraduate degree. They have a small family size of 2, indicating relatively low dependents. Notably, they do not have any personal loans or mortgages, suggesting a conservative approach to debt. However, they do have a credit card with an average annual spend of $3,300, although they do not use online banking, preferring traditional banking methods. Overall, the customer appears to be financially responsible with a moderate spending habit."
 
 ---
 
@@ -184,7 +218,8 @@ This simulates a real-world production data pipeline where dashboards are update
 ## Possible Improvements
 
 Future improvements could include:
-
+* More AI powered functionalities
+* Saving the ETL layers in AWS instead of Databricks?
 * Ingesting data from Apache Kafka
 * Adding more advanced data quality checks
 * Using Databricks Auto Loader for incremental ingestion
