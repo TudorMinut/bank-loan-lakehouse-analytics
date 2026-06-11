@@ -37,8 +37,8 @@ gold_income = (
         count("*").alias("customer_count"),
         spark_sum("personal_loan").alias("loan_accept_count"),
         round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
-        round(avg("income"), 2).alias("avg_income"),
-        round(avg("ccavg"), 2).alias("avg_credit_card_spend")
+        round(avg("income") * 1000, 2).alias("avg_income"),
+        round(avg("ccavg") * 1000, 2).alias("avg_credit_card_spend")
     )
 )
 
@@ -61,8 +61,8 @@ gold_education = (
         count("*").alias("customer_count"),
         spark_sum("personal_loan").alias("loan_accept_count"),
         round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
-        round(avg("income"), 2).alias("avg_income"),
-        round(avg("ccavg"), 2).alias("avg_credit_card_spend")
+        round(avg("income") * 1000, 2).alias("avg_income"),
+        round(avg("ccavg") * 1000, 2).alias("avg_credit_card_spend")
     )
 )
 
@@ -85,9 +85,9 @@ gold_family = (
         count("*").alias("customer_count"),
         spark_sum("personal_loan").alias("loan_accept_count"),
         round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
-        round(avg("income"), 2).alias("avg_income"),
-        round(avg("mortgage"), 2).alias("avg_mortgage"),
-        round(avg("ccavg"), 2).alias("avg_credit_card_spend")
+        round(avg("income") * 1000, 2).alias("avg_income"),
+        round(avg("mortgage") * 1000, 2).alias("avg_mortgage"),
+        round(avg("ccavg") * 1000, 2).alias("avg_credit_card_spend")
     )
 )
 
@@ -121,8 +121,8 @@ gold_digital = (
         count("*").alias("customer_count"),
         spark_sum("personal_loan").alias("loan_accept_count"),
         round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
-        round(avg("income"), 2).alias("avg_income"),
-        round(avg("ccavg"), 2).alias("avg_credit_card_spend")
+        round(avg("income") * 1000, 2).alias("avg_income"),
+        round(avg("ccavg") * 1000, 2).alias("avg_credit_card_spend")
     )
 )
 
@@ -172,9 +172,9 @@ gold_segments = (
         count("*").alias("customer_count"),
         spark_sum("personal_loan").alias("loan_accept_count"),
         round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
-        round(avg("income"), 2).alias("avg_income"),
-        round(avg("ccavg"), 2).alias("avg_credit_card_spend"),
-        round(avg("mortgage"), 2).alias("avg_mortgage"),
+        round(avg("income") * 1000, 2).alias("avg_income"),
+        round(avg("ccavg") * 1000, 2).alias("avg_credit_card_spend"),
+        round(avg("mortgage") * 1000, 2).alias("avg_mortgage"),
         round(avg("online") * 100, 2).alias("online_banking_rate_percent"),
         round(avg("creditcard") * 100, 2).alias("credit_card_rate_percent")
     )
@@ -198,9 +198,9 @@ gold_kpi = (
         count("*").alias("total_customers"),
         spark_sum("personal_loan").alias("total_loan_acceptances"),
         round(avg("personal_loan") * 100, 2).alias("loan_acceptance_rate_percent"),
-        round(avg("income"), 2).alias("avg_income"),
-        round(avg("ccavg"), 2).alias("avg_credit_card_spend"),
-        round(avg("mortgage"), 2).alias("avg_mortgage"),
+        round(avg("income") * 1000, 2).alias("avg_income"),
+        round(avg("ccavg") * 1000, 2).alias("avg_credit_card_spend"),
+        round(avg("mortgage") * 1000, 2).alias("avg_mortgage"),
         round(avg("online") * 100, 2).alias("online_banking_rate_percent"),
         round(avg("creditcard") * 100, 2).alias("credit_card_rate_percent"),
         round(avg("securities_account") * 100, 2).alias("securities_account_rate_percent"),
@@ -248,8 +248,7 @@ gold_kpi.write.format("delta") \
 # MAGIC             CASE WHEN has_mortgage = 1 THEN CONCAT('Mortgage: $', CAST(mortgage AS STRING), 'K') ELSE 'No mortgage' END
 # MAGIC         )
 # MAGIC     ) AS profile_summary
-# MAGIC FROM bank_lakehouse.silver.bank_loans_clean
-# MAGIC LIMIT 10;
+# MAGIC FROM bank_lakehouse.silver.bank_loans_clean;
 
 # COMMAND ----------
 
@@ -263,8 +262,7 @@ gold_kpi.write.format("delta") \
 # MAGIC     personal_loan,
 # MAGIC     profile_summary
 # MAGIC FROM bank_lakehouse.gold.customer_profile_summaries
-# MAGIC ORDER BY income DESC
-# MAGIC LIMIT 10;
+# MAGIC ORDER BY income DESC;
 
 # COMMAND ----------
 
