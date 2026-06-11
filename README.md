@@ -31,7 +31,7 @@ The data is uploaded to AWS S3, processed in Databricks, stored as Delta tables,
 * **Power BI**: Used to build dashboards from the final Gold-layer tables.
 
 **Why PySpark?**
-PySpark is highly useful because it can seamlessly scale to handle massive datasets. Although for a small dataset of around 5,000 rows it may introduce more complexity than a simple pandas-based workflow, it is utilized in this project to demonstrate a realistic, future-proof cloud data engineering architecture.
+PySpark is highly useful because it can seamlessly scale to handle massive datasets with its distributed computing environments, implemented using clusters. Although for a small dataset of around 5,000 rows it may introduce more complexity than a simple pandas-based workflow, it is utilized in this project to demonstrate a realistic, future-proof cloud data engineering architecture.
 
 ---
 
