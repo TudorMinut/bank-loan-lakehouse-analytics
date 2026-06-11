@@ -1,4 +1,19 @@
 # Databricks notebook source
+# DBTITLE 1,Silver Layer - Data Cleaning and Transformation
+# MAGIC %md
+# MAGIC This notebook transforms raw bronze data into clean, validated silver data. Source: bank_lakehouse.bronze.bank_loans
+# MAGIC
+# MAGIC Transformations:
+# MAGIC - Remove duplicate records
+# MAGIC - Cast columns to proper data types (int, double, string)
+# MAGIC - Fix negative experience values (set to 0)
+# MAGIC - Add education_level (Undergraduate/Graduate/Advanced)
+# MAGIC - Add income_group (Low/Medium/High/Very High income)
+# MAGIC - Add has_mortgage binary flag
+# MAGIC - Validate age ranges and data quality
+
+# COMMAND ----------
+
 from pyspark.sql.functions import col, when
 
 bronze_df = spark.table("bank_lakehouse.bronze.bank_loans")

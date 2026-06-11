@@ -1,11 +1,15 @@
 # Databricks notebook source
+# DBTITLE 1,Gold Layer - Business Analytics Tables
 # MAGIC %md
-# MAGIC loan_acceptance_by_income_group
-# MAGIC loan_acceptance_by_education
-# MAGIC loan_acceptance_by_family_size
-# MAGIC loan_acceptance_by_digital_engagement
-# MAGIC customer_segment_summary
-# MAGIC kpi_overview
+# MAGIC This notebook creates aggregated, business-ready tables for analytics and reporting. Source: bank_lakehouse.silver.bank_loans_clean
+# MAGIC
+# MAGIC Gold Tables:
+# MAGIC - loan_acceptance_by_income_group: customer count, loan acceptance count/rate, avg income, avg credit card spend by income group
+# MAGIC - loan_acceptance_by_education: customer count, loan acceptance count/rate, avg income, avg credit card spend by education level
+# MAGIC - loan_acceptance_by_family_size: customer count, loan acceptance count/rate, avg income, avg mortgage, avg credit card spend by family size
+# MAGIC - loan_acceptance_by_digital_engagement: customer count, loan acceptance count/rate, avg income, avg credit card spend by digital segment
+# MAGIC - customer_segment_summary: customer count, loan metrics, avg income/spend/mortgage, online/credit card rates by customer segment
+# MAGIC - kpi_overview: overall totals and averages across all customers
 
 # COMMAND ----------
 
