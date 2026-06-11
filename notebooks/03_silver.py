@@ -1,16 +1,20 @@
 # Databricks notebook source
 # DBTITLE 1,Silver Layer - Data Cleaning and Transformation
 # MAGIC %md
-# MAGIC This notebook transforms raw bronze data into clean, validated silver data. Source: bank_lakehouse.bronze.bank_loans
+# MAGIC Silver Layer - Data Cleaning and Transformation
 # MAGIC
-# MAGIC Transformations:
+# MAGIC This notebook transforms raw bronze data into clean, validated silver data.
+# MAGIC Source: bank_lakehouse.bronze.bank_loans
+# MAGIC Target: bank_lakehouse.silver.bank_loans_clean
+# MAGIC
+# MAGIC Transformations applied:
 # MAGIC - Remove duplicate records
-# MAGIC - Cast columns to proper data types (int, double, string)
-# MAGIC - Fix negative experience values (set to 0)
-# MAGIC - Add education_level (Undergraduate/Graduate/Advanced)
-# MAGIC - Add income_group (Low/Medium/High/Very High income)
-# MAGIC - Add has_mortgage binary flag
-# MAGIC - Validate age ranges and data quality
+# MAGIC - Cast all columns to proper data types (int, double, string)
+# MAGIC - Fix negative experience values (set to 0 if negative)
+# MAGIC - Add education_level column (Undergraduate/Graduate/Advanced/Professional based on education code 1/2/3)
+# MAGIC - Add income_group column (Low <50K, Medium 50-100K, High 100-150K, Very High >150K)
+# MAGIC - Add has_mortgage binary flag (1 if mortgage > 0, else 0)
+# MAGIC - Data quality validation checks: age ranges (18-100), no negative experience, no duplicate IDs
 
 # COMMAND ----------
 

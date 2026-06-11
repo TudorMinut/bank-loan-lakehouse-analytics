@@ -1,15 +1,19 @@
 # Databricks notebook source
 # DBTITLE 1,Gold Layer - Business Analytics Tables
 # MAGIC %md
-# MAGIC This notebook creates aggregated, business-ready tables for analytics and reporting. Source: bank_lakehouse.silver.bank_loans_clean
+# MAGIC Gold Layer - Business Analytics Tables
 # MAGIC
-# MAGIC Gold Tables:
-# MAGIC - loan_acceptance_by_income_group: customer count, loan acceptance count/rate, avg income, avg credit card spend by income group
-# MAGIC - loan_acceptance_by_education: customer count, loan acceptance count/rate, avg income, avg credit card spend by education level
-# MAGIC - loan_acceptance_by_family_size: customer count, loan acceptance count/rate, avg income, avg mortgage, avg credit card spend by family size
-# MAGIC - loan_acceptance_by_digital_engagement: customer count, loan acceptance count/rate, avg income, avg credit card spend by digital segment
-# MAGIC - customer_segment_summary: customer count, loan metrics, avg income/spend/mortgage, online/credit card rates by customer segment
-# MAGIC - kpi_overview: overall totals and averages across all customers
+# MAGIC This notebook creates 7 aggregated, business-ready tables for analytics and reporting.
+# MAGIC Source: bank_lakehouse.silver.bank_loans_clean
+# MAGIC
+# MAGIC Gold tables created:
+# MAGIC - loan_acceptance_by_income_group: Loan metrics grouped by income ranges
+# MAGIC - loan_acceptance_by_education: Loan metrics grouped by education level
+# MAGIC - loan_acceptance_by_family_size: Loan metrics grouped by family size
+# MAGIC - loan_acceptance_by_digital_engagement: Loan metrics grouped by digital banking usage (online + credit card segments)
+# MAGIC - customer_segment_summary: Comprehensive metrics by customer segment (high-income prospects, existing loan customers, etc.)
+# MAGIC - customer_profile_summaries: AI-generated customer profiles using ai_gen() function for CRM and marketing use
+# MAGIC - kpi_overview: Overall business KPIs and summary metrics
 
 # COMMAND ----------
 
@@ -214,6 +218,53 @@ gold_kpi.write.format("delta") \
 
 # MAGIC %sql
 # MAGIC SELECT * FROM bank_lakehouse.gold.kpi_overview;
+
+# COMMAND ----------
+
+# DBTITLE 1,AI-Powered Customer Profile Summaries
+# MAGIC %sql
+# MAGIC CREATE OR REPLACE TABLE bank_lakehouse.gold.customer_profile_summaries AS
+# MAGIC SELECT 
+# MAGIC     id,
+# MAGIC     age,
+# MAGIC     income,
+# MAGIC     education_level,
+# MAGIC     family,
+# MAGIC     personal_loan,
+# MAGIC     ai_gen(
+# MAGIC         CONCAT(
+# MAGIC             'I am bank employee. 
+# MAGIC              I want a short description of the financial position of this customer .
+# MAGIC              Describe the customer in a short paragraph. 
+# MAGIC              The customer has the following attributes ',
+# MAGIC             'Age: ', CAST(age AS STRING), ', ',
+# MAGIC             'Income: $', CAST(income AS STRING), 'K, ',
+# MAGIC             'Education: ', education_level, ', ',
+# MAGIC             'Family size: ', CAST(family AS STRING), ', ',
+# MAGIC             CASE WHEN personal_loan = 1 THEN 'Has personal loan, ' ELSE 'No personal loan, ' END,
+# MAGIC             CASE WHEN online = 1 THEN 'Uses online banking, ' ELSE 'No online banking, ' END,
+# MAGIC             CASE WHEN creditcard = 1 THEN 'Has credit card, ' ELSE 'No credit card, ' END,
+# MAGIC             'Credit card avg spend: $', CAST(ccavg AS STRING), 'K, ',
+# MAGIC             CASE WHEN has_mortgage = 1 THEN CONCAT('Mortgage: $', CAST(mortgage AS STRING), 'K') ELSE 'No mortgage' END
+# MAGIC         )
+# MAGIC     ) AS profile_summary
+# MAGIC FROM bank_lakehouse.silver.bank_loans_clean
+# MAGIC LIMIT 10;
+
+# COMMAND ----------
+
+# DBTITLE 1,View Customer Profile Summaries
+# MAGIC %sql
+# MAGIC SELECT 
+# MAGIC     id,
+# MAGIC     age,
+# MAGIC     income,
+# MAGIC     education_level,
+# MAGIC     personal_loan,
+# MAGIC     profile_summary
+# MAGIC FROM bank_lakehouse.gold.customer_profile_summaries
+# MAGIC ORDER BY income DESC
+# MAGIC LIMIT 10;
 
 # COMMAND ----------
 
