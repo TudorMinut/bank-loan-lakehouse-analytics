@@ -2,7 +2,7 @@
 
 A data engineering and analytics project that builds a Lakehouse pipeline for bank loan customer data using **Databricks**, **PySpark**, **SQL**, **AWS S3**, and **Power BI**.
 
-The project takes raw bank client data, processes it through a Bronze-Silver-Gold architecture, creates business-ready analytics tables, and exposes the final results for dashboarding and reporting in Power BI.
+The project takes raw bank client data, processes it through a Bronze-Silver-Gold architecture, creates valuable information for analytics tables, and exposes the final results for dashboarding and reporting in Power BI.
 
 ---
 
