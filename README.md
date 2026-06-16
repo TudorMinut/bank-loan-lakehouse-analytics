@@ -1,5 +1,7 @@
 # Bank Loan Lakehouse Analytics
 
+<img width="1115" height="632" alt="image" src="https://github.com/user-attachments/assets/0b02e3f3-b3ef-4701-933b-56dd58fa4496" />
+
 A data engineering and analytics project that builds a Lakehouse pipeline for bank loan customer data using **Databricks**, **PySpark**, **SQL**, **AWS S3**, and **Power BI**.
 
 The project takes raw bank client data, processes it through a Bronze-Silver-Gold architecture, creates valuable information for analytics tables, and exposes the final results for dashboarding and reporting in Power BI.
